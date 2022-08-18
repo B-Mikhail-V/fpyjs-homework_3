@@ -19,14 +19,6 @@ class Good {
     }
 }
 
-good1 = new Good (1, "Костюм", "Модный", [48, 50, 52, 54], 8300, 1)
-good2 = new Good (2, "Рукавицы для прогулок", "Шерсть", ["L", "XL"], 2300, 1)
-good3 = new Good (3, "Ботинки классика", "Черные", [38, 39, 40, 42], 4500, 1)
-good4 = new Good (4, "Костюм спортивный", "Серые", [48, 50, 52, 54], 3800, 1)
-good5 = new Good (5, "Рубашка", "В полосочку", [44, 46, 48, 50], 9000, 1)
-good6 = new Good (6, "Футболка спортивная", "С логотипом", ["S", "L", "XL", "XXL"], 1300, 1)
-good7 = new Good (7, "Ботинки для похода", "Крепкие", [40, 41, 43, 45], 3900, 1)
-
 
 class GoodList {
    #goods;
@@ -38,6 +30,7 @@ class GoodList {
     }
     
     get list () {
+        const regFilter = this.filter;
         let sortSwitch = 0
         switch (this.sortDir) {
             case true: 
@@ -48,13 +41,12 @@ class GoodList {
                 break;
         }    
         if (this.sortPrice == true) {
-            const regFilter = this.filter;
             const result = this.#goods.sort((a, b) => a.price >= b.price ? (-1 + sortSwitch) : (1 - sortSwitch))
                             .filter(good => good.available == 1 && regFilter.test(good.name))
                             
             return result;
         } else {
-            return this.#goods;
+            return this.#goods.filter(good => good.available == 1 && regFilter.test(good.name));
         }
     
     }
@@ -89,7 +81,7 @@ class BasketGood extends Good {
 
 class Basket {
     constructor () {
-        this.goods = goods
+        this.goods = [];
     }
 
     addGood (basketGood) {
@@ -124,71 +116,104 @@ class Basket {
     }
 
     get totalAmount () {
-        const amounts = this.goods.map(good => good.amount)
+        if (this.goods.length !== 0) {
+            const amounts = this.goods.map(good => good.amount)
                         .reduce((total, amount) => total + amount);
-        return amounts;
+            return amounts;
+        } else {
+            return 0;
+        }
+        
     }
 
     get totalSum () {
-        const sum = this.goods.map(good => good.price * good.amount)
+        if (this.goods.length !== 0) {
+            const sum = this.goods.map(good => good.price * good.amount)
                         .reduce((total, amount) => total + amount);
-        return sum;                             
+            return sum;
+        } else {
+            return 0;
+        }                             
     }
-
-
 
 }
 
+// Экземпляры класса Good
+good1 = new Good (1, "Костюм", "Модный", [48, 50, 52, 54], 8300, 1)
+good2 = new Good (2, "Рукавицы для прогулок", "Шерсть", ["L", "XL"], 2300, 1)
+good3 = new Good (3, "Ботинки классика", "Черные", [38, 39, 40, 42], 4500, 1)
+good4 = new Good (4, "Костюм спортивный", "Серые", [48, 50, 52, 54], 3800, 1)
+good5 = new Good (5, "Рубашка", "В полосочку", [44, 46, 48, 50], 9000, 1)
+good6 = new Good (6, "Футболка спортивная", "С логотипом", ["S", "L", "XL", "XXL"], 1300, 1)
+good7 = new Good (7, "Ботинки для похода", "Крепкие", [40, 41, 43, 45], 3900, 1)
 
+
+// Изменение признака доступности, можно менять для проверки методов
 good1.setAvailable(1)
 good2.setAvailable(1)
-good3.setAvailable(0)
+good3.setAvailable(1)
 good4.setAvailable(1)
 good5.setAvailable(1)
-good6.setAvailable(0)
+good6.setAvailable(1)
 good7.setAvailable(1)
 
-// goodsAllIndex = {1: good1, 2: good2, 3: good3, 4: good4, 5: good5, 6: good6};
 
+// Массив экземпляров класса Good
 goodsAll = [good1, good2, good3, good4, good5, good6]
-// console.log(goods_All)
-goodList1 = new GoodList(goodsAll, /Ру/ig, true, true)
-goodList2 = new GoodList(goodsAll, /спорт/ig, true, false)
-goodList3 = new GoodList(goodsAll, /для/g, false, true)
-// console.log(goodList2.filter)
-// console.log(goodList3.list[5].id)
 
+
+// Экземпляры класса GoodList
+goodList1 = new GoodList(goodsAll, /Ру/ig, true, true) // сортировка - да, по возрастанию цены
+goodList2 = new GoodList(goodsAll, /спорт/ig, true, false) // сортировка - да, по убыванию цены
+goodList3 = new GoodList(goodsAll, /для/g, false, true) // сортировка - нет
+goodList4 = new GoodList(goodsAll, /./, false, true) // весь каталог
+
+
+// Фильтрация и сортировка goodList
+console.log(goodList1.list)
 // console.log(goodList2.list)
-// goodList1.add(good2)
-// console.log(goodList1.list)
-// goodList3.remove(5)
-// console.log(goodList1.list)
+// console.log(goodList3.list)
+// console.log(goodList4.list)
 
+
+// Добавление и удаление товара в каталог товаров
+// goodList4.add(good7)
+// goodList4.remove(5)
+// console.log(goodList4.list)
+
+
+// Экземпляры класса BasketGood
 basketGood1 = new BasketGood(good1, 50, 3)
 basketGood3 = new BasketGood(good3, 40, 2)
 basketGood31 = new BasketGood(good3, 40, 5)
 basketGood32 = new BasketGood(good3, 42, 3)
 basketGood5 = new BasketGood(good5, 44, 1)
-console.log(basketGood1)
-// console.log(basketGood2)
-goods = [basketGood1, basketGood3]
 
-basket1 = new Basket(goods)
-// console.log(basket1)
+// Экземпляр класса Basket
+basket1 = new Basket()
+
+// Добавление товаров в basket1
+basket1.addGood(basketGood1)
+basket1.addGood(basketGood3)
 basket1.addGood(basketGood31)
 basket1.addGood(basketGood32)
-console.log(basket1)
+basket1.addGood(basketGood5)
 
+
+// Полная очистка корзины
 // basket1.clear()
 // console.log(basket1)
 
+// Удаление товаров из корзины
 // basket1.remove(good3, 42, 3)
 // basket1.remove(good3, 40, 4)
-// console.log(basket1)
 
 
+// Удаление из корзины недоступных товаров
 // basket1.removeUnavailable()
+
 // console.log(basket1)
 
+// Вывод результирующих параметров
 console.log("Общее количество товаров в корзине:", basket1.totalAmount)
 console.log("Общая стоимость товаров в корзин:", basket1.totalSum)
